@@ -41,44 +41,48 @@ bool isDone(){
     return TRUE;
 }
 void connectPairs(){
-    int currentPreferenceLevel = 0;
+    int currentPreferenceLevelBuyer = 0;
+    int currentPreferenceLevelSeller = 0;
     int currentProposal = NOT_CONNECTED;
     
     while(isDone() != TRUE){
-        if(currentPreferenceLevel > 4)
-            currentPreferenceLevel = 0;
+        
+        if(currentPreferenceLevelBuyer > 4){
+            currentPreferenceLevelBuyer = 0;
+            currentPreferenceLevelSeller++;
+            if(currentPreferenceLevelSeller > 4){
+                currentPreferenceLevelSeller = 0;
+            }
+        }
         
         for(int i = 0; i < NUM_OF_PAIRS; i++)
         {
             if(buyersConnected[i] == NOT_CONNECTED)
             {
-                currentProposal = buyer[i][currentPreferenceLevel];
+                currentProposal = buyer[i][currentPreferenceLevelBuyer];
                 
-                for(int j = 0; j < NUM_OF_PAIRS; j++)
+                if (seller[currentProposal][currentPreferenceLevelSeller] == i)
                 {
-                    if (seller[currentProposal][j] == i)
+                    if( sellersConnected[currentProposal][PAIR] == NOT_CONNECTED)
                     {
-                        if( sellersConnected[currentProposal][PAIR] == NOT_CONNECTED)
-                        {
-                            buyersConnected[i]                                  = currentProposal;
-                            sellersConnected[currentProposal][PAIR]             = i;
-                            sellersConnected[currentProposal][CONNECTION_LEVEL] = j;
-                            continue;
-                        }
-                        else if( sellersConnected[currentProposal][CONNECTION_LEVEL] > j){
-                            int buyerToClean = sellersConnected[currentProposal][PAIR];
-                            buyersConnected[buyerToClean]                       = NOT_CONNECTED;
-                            
-                            buyersConnected[i]                                  = currentProposal;
-                            sellersConnected[currentProposal][PAIR]             = i;
-                            sellersConnected[currentProposal][CONNECTION_LEVEL] = j;
-                            continue;
-                        }
+                        buyersConnected[i]                                  = currentProposal;
+                        sellersConnected[currentProposal][PAIR]             = i;
+                        sellersConnected[currentProposal][CONNECTION_LEVEL] = currentPreferenceLevelSeller;
+                        continue;
+                    }
+                    else if( sellersConnected[currentProposal][CONNECTION_LEVEL] > currentPreferenceLevelSeller){
+                        int buyerToClean = sellersConnected[currentProposal][PAIR];
+                        buyersConnected[buyerToClean]                       = NOT_CONNECTED;
+                        
+                        buyersConnected[i]                                  = currentProposal;
+                        sellersConnected[currentProposal][PAIR]             = i;
+                        sellersConnected[currentProposal][CONNECTION_LEVEL] = currentPreferenceLevelSeller;
+                        continue;
                     }
                 }
             }
         }
-        currentPreferenceLevel++;
+        currentPreferenceLevelBuyer++;
     }
 }
 
